@@ -332,6 +332,9 @@ def max_min(input_list):
 # Interaction: <description of how the AI tool was used, e.g., prompts given>
 # Verification: <how you verified the correctness of the AI-generated code>
 def subset_sum(input_set, target_sum):
+    if target_sum < 0:
+        return False
+
     possible = [False] * (target_sum + 1)
     possible[0] = True
 
@@ -362,23 +365,26 @@ def subset_sum(input_set, target_sum):
 # Interaction: <description of how the AI tool was used, e.g., prompts given>
 # Verification: <how you verified the correctness of the AI-generated code>
 def min_cost_path_recursive(costs, m_minus_one, n_minus_one):
-    if m_minus_one == 0 and n_minus_one == 0:
-        return costs[0][0]
+    def solve(row, column):
+        if row == 0 and column == 0:
+            return costs[0][0]
 
-    if m_minus_one == 0:
-        return costs[0][n_minus_one] + min_cost_path_recursive(
-            costs, 0, n_minus_one - 1)
+        if row == 0:
+            return costs[0][column] + solve(0, column - 1)
 
-    if n_minus_one == 0:
-        return costs[m_minus_one][0] + min_cost_path_recursive(
-            costs, m_minus_one - 1, 0)
+        if column == 0:
+            return costs[row][0] + solve(row - 1, 0)
 
-    diagonal = min_cost_path_recursive(
-        costs, m_minus_one - 1, n_minus_one - 1)
-    up = min_cost_path_recursive(costs, m_minus_one - 1, n_minus_one)
-    left = min_cost_path_recursive(costs, m_minus_one, n_minus_one - 1)
+        diagonal = solve(row - 1, column - 1)
+        up = solve(row - 1, column)
+        left = solve(row, column - 1)
 
-    return costs[m_minus_one][n_minus_one] + min(diagonal, up, left)
+        return costs[row][column] + min(diagonal, up, left)
+
+    start = timer()
+    answer = solve(m_minus_one, n_minus_one)
+    print("Naive recursive time:", timer() - start)
+    return answer
 
 
 # function header for Q6.2 (Auto & manual grading)
@@ -389,9 +395,9 @@ def min_cost_path_recursive(costs, m_minus_one, n_minus_one):
 # note: use the TOP-DOWN DP approach (memoization); also PRINT its running time
 # note: write comments for key lines of code (for, while, if, ...) to demonstrate your comprehension
 #
-# AI Tool Used: <tool name or "None">
-# Interaction: <description of how the AI tool was used, e.g., prompts given>
-# Verification: <how you verified the correctness of the AI-generated code>
+# AI Tool Used: ChatGPT
+# Interaction: Used when I was stuck or wanted clarification about the algorithms.
+# Verification: I tested the implementation against provided examples and checked the returned values.
 def min_cost_path_topdown(costs, m_minus_one, n_minus_one):
     memo = {}
 
@@ -415,7 +421,10 @@ def min_cost_path_topdown(costs, m_minus_one, n_minus_one):
         memo[(row, column)] = answer
         return answer
 
-    return find_cost(m_minus_one, n_minus_one)
+    start = timer()
+    answer = find_cost(m_minus_one, n_minus_one)
+    print("Top-down DP time:", timer() - start)
+    return answer
 
 
 # function header for Q6.3 (Auto & manual grading)
@@ -430,6 +439,7 @@ def min_cost_path_topdown(costs, m_minus_one, n_minus_one):
 # Interaction: <description of how the AI tool was used, e.g., prompts given>
 # Verification: <how you verified the correctness of the AI-generated code>
 def min_cost_path_bottomup(costs, m_minus_one, n_minus_one):
+    start = timer()
     rows = m_minus_one + 1
     columns = n_minus_one + 1
     dp = [[0] * columns for _ in range(rows)]
@@ -450,7 +460,9 @@ def min_cost_path_bottomup(costs, m_minus_one, n_minus_one):
                 dp[row - 1][column],
                 dp[row][column - 1])
 
-    return dp[m_minus_one][n_minus_one]
+    answer = dp[m_minus_one][n_minus_one]
+    print("Bottom-up DP time:", timer() - start)
+    return answer
 
 
 # function header for Q6.4 (Manual grading, 0 points autograder)
@@ -649,6 +661,9 @@ def q8_1():
 # Verification: <how you verified the correctness of the AI-generated code>
 #
 def coin_change_dp(coins, target_value):
+    if target_value < 0:
+        return False
+
     possible = [False] * (target_value + 1)
     possible[0] = True
 
